@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import GoalList from './GoalList';
+import GoalList from './components/GoalList';
 
 function App() {
   const [goals, setGoals] = useState([]);
@@ -126,3 +126,5 @@ function App() {
 }
 
 export default App;
+
+
