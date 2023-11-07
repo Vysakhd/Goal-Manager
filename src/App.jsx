@@ -152,9 +152,10 @@
 // export default App;
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Import Axios
+
 import GoalList from './components/GoalList';
-// import './App.css';
 
 function App() {
   const [goals, setGoals] = useState([]);
@@ -165,28 +166,60 @@ function App() {
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
 
+  useEffect(() => {
+    // Fetch goals from your API on component mount (or wherever appropriate)
+    axios.get('http://localhost:8080/goals')
+      .then((response) => {
+        setGoals(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching goals:', error);
+      });
+  }, []);
+
   const addGoal = () => {
     if (newGoal.trim() !== '') {
-      setGoals([
-        ...goals,
-        {
-          id: Date.now(),
-          text: newGoal,
-          description: newGoalDescription,
-          progress: 0,
-          startDate: newStartDate,
-          endDate: newEndDate,
-        },
-      ]);
-      setNewGoal('');
-      setNewGoalDescription('');
-      setNewStartDate('');
-      setNewEndDate('');
+      // Create a goal object with the necessary data
+      const goalData = {
+        text: newGoal,
+        description: newGoalDescription,
+        progress: 0,
+        startDate: newStartDate,
+        endDate: newEndDate,
+      };
+
+      // Send a POST request to your API
+      axios.post('http://localhost:8080/goals', goalData)
+        .then((response) => {
+          // Handle the response, you can update your state or perform other actions if needed
+          console.log('Goal added successfully:', response.data);
+
+          // Clear input fields and close the modal
+          setNewGoal('');
+          setNewGoalDescription('');
+          setNewStartDate('');
+          setNewEndDate('');
+
+          closeModal();
+
+          // You may also fetch goals again to refresh the list
+          axios.get('http://localhost:8080/goals')
+            .then((response) => {
+              setGoals(response.data);
+            })
+            .catch((error) => {
+              console.error('Error fetching goals:', error);
+            });
+        })
+        .catch((error) => {
+          // Handle any errors that occurred during the request
+          console.error('Error adding goal:', error);
+        });
     }
   };
 
   const deleteGoal = (goalId) => {
-    setGoals(goals.filter((goal) => goal.id !== goalId));
+    // Handle goal deletion here, you can use Axios to send a DELETE request to your API
   };
 
   const openModal = () => {
@@ -203,58 +236,15 @@ function App() {
   };
 
   const saveGoal = () => {
-    if (newGoal.trim() !== '') {
-      if (editGoalId !== null) {
-        setGoals((prevGoals) =>
-          prevGoals.map((goal) =>
-            goal.id === editGoalId
-              ? {
-                  ...goal,
-                  text: newGoal,
-                  description: newGoalDescription,
-                  startDate: newStartDate,
-                  endDate: newEndDate,
-                }
-              : goal
-          )
-        );
-        closeModal();
-      } else {
-        setGoals([
-          ...goals,
-          {
-            id: Date.now(),
-            text: newGoal,
-            description: newGoalDescription,
-            progress: 0,
-            startDate: newStartDate,
-            endDate: newEndDate,
-          },
-        ]);
-        setNewGoal('');
-        setNewGoalDescription('');
-        setNewStartDate('');
-        setNewEndDate('');
-      }
-    }
+    // Handle goal save or edit here, you can use Axios to send a PUT or PATCH request to your API
   };
 
   const editGoal = (goalId) => {
-    setEditGoalId(goalId);
-    const goalToEdit = goals.find((goal) => goal.id === goalId);
-    setNewGoal(goalToEdit.text);
-    setNewGoalDescription(goalToEdit.description);
-    setNewStartDate(goalToEdit.startDate);
-    setNewEndDate(goalToEdit.endDate);
-    openModal();
+    // Handle goal editing here
   };
 
   const updateProgress = (goalId, newProgress) => {
-    setGoals((prevGoals) =>
-      prevGoals.map((goal) =>
-        goal.id === goalId ? { ...goal, progress: newProgress } : goal
-      )
-    );
+    // Handle updating the progress of a goal, you can use Axios to send a PUT or PATCH request to your API
   };
 
   return (
