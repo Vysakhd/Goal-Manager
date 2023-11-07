@@ -13,3 +13,4 @@ function GoalList({ goals, onDelete, onEdit, updateProgress }) {
 }
 
 export default GoalList;
+
