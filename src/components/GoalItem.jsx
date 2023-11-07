@@ -1,26 +1,3 @@
-// import React from 'react';
-
-// function GoalItem({ goal, onDelete, onEdit }) {
-//   return (
-//     <div className="flex-col items-center justify-between p-[2px] border-b w-[600px] text-left">
-//       <div className='text-[25px]'>{goal.text}</div>
-//       <div>{goal.description}</div>
-//       <div>
-//         <button onClick={() => onEdit(goal.id)} className="text-blue-500 mr-[2px]">
-//           Edit
-//         </button>
-//         <button  onClick={() => onDelete(goal.id)} className="text-red-500 ml-[5px]">
-//           Delete
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default GoalItem;
-
-
-
 
 import React, { useState } from 'react';
 
