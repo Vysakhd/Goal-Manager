@@ -15,7 +15,8 @@ function GoalItem({ goal, onDelete, onEdit, updateProgress }) {
   };
 
   return (
-    <div className="flex-col items-center justify-between p-[2px] border-b w-[600px]">
+    <div className="flex-col py-10 items-center justify-between p-[2px] border-b w-[600px]">
+      <div className='text-[35px]'>{goal.title}</div>
       <div className='text-[25px]'>{goal.text}</div>
       <div className='mt-[px]'>{goal.description}</div>
       {isEditingProgress ? (

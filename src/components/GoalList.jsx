@@ -3,6 +3,7 @@ import React from 'react';
 import GoalItem from './GoalItem';
 
 function GoalList({ goals, onDelete, onEdit, updateProgress }) {
+  console.log(goals)
   return (
     <div className="mt-[4px]">
       {goals.map((goal) => (
