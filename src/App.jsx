@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import GoalList from './components/GoalList';
 
 function App() {
   const [goals, setGoals] = useState([]);
-  const [goalData, setGoalData] = useState({
-    title: '',
-    description: '',
-    startDate: '',
-    endDate: ''
-  });
   const [newGoal, setNewGoal] = useState('');
   const [newGoalDescription, setNewGoalDescription] = useState('');
   const [editGoalId, setEditGoalId] = useState(null);
@@ -19,7 +12,7 @@ function App() {
   const [newEndDate, setNewEndDate] = useState('');
 
   useEffect(() => {
-    
+    // Fetch initial data when the component mounts
     axios.get('http://localhost:8080/goals?page=0&size=10')
       .then((response) => {
         setGoals(response.data);
@@ -46,7 +39,14 @@ function App() {
           setNewStartDate('');
           setNewEndDate('');
           closeModal();
-          updateGoalList();
+
+          axios.get('http://localhost:8080/goals?page=0&size=10')
+            .then((response) => {
+              setGoals(response.data);
+            })
+            .catch((error) => {
+              console.error('Error fetching goals:', error);
+            });
         })
         .catch((error) => {
           console.error('Error adding goal:', error);
@@ -55,11 +55,9 @@ function App() {
   };
 
   const deleteGoal = (goalId) => {
-    
     axios.delete(`http://localhost:8080/goals/${goalId}`)
       .then((response) => {
         console.log('Goal deleted successfully:', response.data);
-        
         setGoals(goals.filter((goal) => goal.id !== goalId));
       })
       .catch((error) => {
@@ -80,89 +78,44 @@ function App() {
     setNewEndDate('');
   };
 
-  const updateGoalList = () => {
-    axios.get('http://localhost:8080/goals?page=0&size=10')
-      .then((response) => {
-        setGoals(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching goals:', error);
-      });
-  };
-
   const saveGoal = () => {
-    
     if (newGoal.trim() !== '') {
       if (editGoalId !== null) {
-        
-        const updatedGoal = {
-          title: newGoal,
-          description: newGoalDescription,
-          startDate: newStartDate,
-          endDate: newEndDate,
-        };
-
-        axios.put(`http://localhost:8080/goals/${editGoalId}`, updatedGoal)
-          .then((response) => {
-            console.log('Goal updated successfully:', response.data);
-            
-            setGoals((prevGoals) =>
-              prevGoals.map((goal) =>
-                goal.id === editGoalId
-                  ? {
-                      ...goal,
-                      title: newGoal,
-                      description: newGoalDescription,
-                      startDate: newStartDate,
-                      endDate: newEndDate,
-                    }
-                  : goal
-              )
-            );
-            closeModal();
-          })
-          .catch((error) => {
-            console.error('Error updating goal:', error);
-          });
+        setGoals((prevGoals) =>
+          prevGoals.map((goal) =>
+            goal.id === editGoalId
+              ? {
+                  ...goal,
+                  title: newGoal,
+                  description: newGoalDescription,
+                  startDate: newStartDate,
+                  endDate: newEndDate,
+                }
+              : goal
+          )
+        );
+        closeModal();
       } else {
-        
-        const newGoalData = {
-          title: newGoal,
-          description: newGoalDescription,
-          startDate: newStartDate,
-          endDate: newEndDate,
-        };
-
-        axios.post('http://localhost:8080/goals', newGoalData)
-          .then((response) => {
-            console.log('Goal added successfully:', response.data);
-            
-            setGoals([
-              ...goals,
-              {
-                id: response.data.id, 
-                title: newGoal,
-                description: newGoalDescription,
-                progress: 0,
-                startDate: newStartDate,
-                endDate: newEndDate,
-              },
-            ]);
-            setNewGoal('');
-            setNewGoalDescription('');
-            setNewStartDate('');
-            setNewEndDate('');
-            closeModal();
-          })
-          .catch((error) => {
-            console.error('Error adding goal:', error);
-          });
+        setGoals([
+          ...goals,
+          {
+            id: Date.now(),
+            title: newGoal,
+            description: newGoalDescription,
+            progress: 0,
+            startDate: newStartDate,
+            endDate: newEndDate,
+          },
+        ]);
+        setNewGoal('');
+        setNewGoalDescription('');
+        setNewStartDate('');
+        setNewEndDate('');
       }
     }
   };
 
   const editGoal = (goalId) => {
-    
     setEditGoalId(goalId);
     const goalToEdit = goals.find((goal) => goal.id === goalId);
     setNewGoal(goalToEdit.title);
@@ -173,7 +126,6 @@ function App() {
   };
 
   const updateProgress = (goalId, newProgress) => {
-   
     setGoals((prevGoals) =>
       prevGoals.map((goal) =>
         goal.id === goalId ? { ...goal, progress: newProgress } : goal
