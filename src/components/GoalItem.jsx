@@ -15,37 +15,35 @@ function GoalItem({ goal, onDelete, onEdit, updateProgress }) {
   };
 
   return (
-    <div className="flex-col py-10 items-center justify-between p-[2px] border-b w-[600px]">
-      <div className='text-[35px]'>{goal.title}</div>
-      <div className='text-[25px]'>{goal.text}</div>
-      <div className='mt-[px]'>{goal.description}</div>
-      {isEditingProgress ? (
-        <div>
-          <input
-            type="number"
-            value={newProgress}
-            onChange={(e) => setNewProgress(parseInt(e.target.value))}
-          />
-          <button onClick={handleSaveProgress}>Save</button>
-        </div>
-      ) : (
-        <div>
-          <div>Progress: {goal.progress}%</div>
-          <button onClick={handleEditProgress}>Edit Progress</button>
-        </div>
-      )}
-      <div>
-        <button onClick={() => onEdit(goal.id)} className="text-blue-500 mr-[2px]">
-          Edit
-        </button>
-        <button onClick={() => onDelete(goal.id)} className="text-red-500 ml-[5px]">
-          Delete
-        </button>
+    <div onClick={() => onEdit(goal.id)} className="cursor-pointer py-10 items-center justify-between p-[2px] border-b w-[600px]">
+      <div >
+        <div className='text-[35px]'>{goal.title}</div>
+        <div className='text-[25px]'>{goal.text}</div>
+        <div className='mt-[px]'>{goal.description}</div>
+        {isEditingProgress ? (
+          <div>
+            <input
+              type="number"
+              value={newProgress}
+              onChange={(e) => setNewProgress(parseInt(e.target.value))}
+            />
+            <button onClick={handleSaveProgress}>Save</button>
+          </div>
+        ) : (
+          <div>
+            <div>Progress: {goal.progress}%</div>
+            <button onClick={handleEditProgress}>Edit Progress</button>
+          </div>
+        )}
+        <div className='mt-8'></div>
       </div>
+     
     </div>
   );
 }
 
 export default GoalItem;
+GoalItem.jsx
+
 
 

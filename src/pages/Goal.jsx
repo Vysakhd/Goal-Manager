@@ -1,25 +1,23 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import GoalList from '../components/GoalList';
+import Graph from '../pages/Graph';
+import Milestones from '../components/Milestones';
+// import Pagination from '../components/Pagination';
 
 function Goal() {
   const [goals, setGoals] = useState([]);
-  const [goalData, setGoalData] = useState({
-    title: '',
-    description: '',
-    startDate: '',
-    endDate: ''
-  });
   const [newGoal, setNewGoal] = useState('');
   const [newGoalDescription, setNewGoalDescription] = useState('');
   const [editGoalId, setEditGoalId] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
+  const [milestones, setMilestones] = useState([]);
+  const [milestoneText, setMilestoneText] = useState('');
 
   useEffect(() => {
-   
     axios.get('http://localhost:8080/goals?page=0&size=10')
       .then((response) => {
         setGoals(response.data);
@@ -36,6 +34,7 @@ function Goal() {
         description: newGoalDescription,
         startDate: newStartDate,
         endDate: newEndDate,
+        milestones: milestones,
       };
 
       axios.post('http://localhost:8080/goals', newGoalData)
@@ -45,6 +44,7 @@ function Goal() {
           setNewGoalDescription('');
           setNewStartDate('');
           setNewEndDate('');
+          setMilestones([]);
           closeModal();
           updateGoalList();
         })
@@ -55,12 +55,11 @@ function Goal() {
   };
 
   const deleteGoal = (goalId) => {
-    
     axios.delete(`http://localhost:8080/goals/${goalId}`)
       .then((response) => {
         console.log('Goal deleted successfully:', response.data);
-  
         setGoals(goals.filter((goal) => goal.id !== goalId));
+        closeModal();
       })
       .catch((error) => {
         console.error('Error deleting goal:', error);
@@ -78,6 +77,8 @@ function Goal() {
     setNewGoalDescription('');
     setNewStartDate('');
     setNewEndDate('');
+    setMilestones([]);
+    setMilestoneText('');
   };
 
   const updateGoalList = () => {
@@ -91,21 +92,19 @@ function Goal() {
   };
 
   const saveGoal = () => {
-    
     if (newGoal.trim() !== '') {
       if (editGoalId !== null) {
-        
         const updatedGoal = {
           title: newGoal,
           description: newGoalDescription,
           startDate: newStartDate,
           endDate: newEndDate,
+          milestones: milestones,
         };
 
         axios.put(`http://localhost:8080/goals/${editGoalId}`, updatedGoal)
           .then((response) => {
             console.log('Goal updated successfully:', response.data);
-            
             setGoals((prevGoals) =>
               prevGoals.map((goal) =>
                 goal.id === editGoalId
@@ -115,6 +114,7 @@ function Goal() {
                       description: newGoalDescription,
                       startDate: newStartDate,
                       endDate: newEndDate,
+                      milestones: milestones,
                     }
                   : goal
               )
@@ -125,18 +125,17 @@ function Goal() {
             console.error('Error updating goal:', error);
           });
       } else {
-        
         const newGoalData = {
           title: newGoal,
           description: newGoalDescription,
           startDate: newStartDate,
           endDate: newEndDate,
+          milestones: milestones,
         };
 
         axios.post('http://localhost:8080/goals', newGoalData)
           .then((response) => {
             console.log('Goal added successfully:', response.data);
-            
             setGoals([
               ...goals,
               {
@@ -146,12 +145,14 @@ function Goal() {
                 progress: 0,
                 startDate: newStartDate,
                 endDate: newEndDate,
+                milestones: milestones,
               },
             ]);
             setNewGoal('');
             setNewGoalDescription('');
             setNewStartDate('');
             setNewEndDate('');
+            setMilestones([]);
             closeModal();
           })
           .catch((error) => {
@@ -162,21 +163,35 @@ function Goal() {
   };
 
   const editGoal = (goalId) => {
-    
     setEditGoalId(goalId);
     const goalToEdit = goals.find((goal) => goal.id === goalId);
     setNewGoal(goalToEdit.title);
     setNewGoalDescription(goalToEdit.description);
     setNewStartDate(goalToEdit.startDate);
     setNewEndDate(goalToEdit.endDate);
+    setMilestones(goalToEdit.milestones || []);
     openModal();
   };
 
   const updateProgress = (goalId, newProgress) => {
-    
     setGoals((prevGoals) =>
       prevGoals.map((goal) =>
         goal.id === goalId ? { ...goal, progress: newProgress } : goal
+      )
+    );
+  };
+
+  const addMilestone = () => {
+    if (milestoneText.trim() !== '') {
+      setMilestones([...milestones, { id: Date.now(), text: milestoneText, completed: false }]);
+      setMilestoneText('');
+    }
+  };
+
+  const toggleMilestone = (milestoneId) => {
+    setMilestones((prevMilestones) =>
+      prevMilestones.map((milestone) =>
+        milestone.id === milestoneId ? { ...milestone, completed: !milestone.completed } : milestone
       )
     );
   };
@@ -196,7 +211,7 @@ function Goal() {
         />
         <input
           type="text"
-          placeholder="Goal Updates"
+          placeholder="Goal Description"
           className="w-2/5 p-2 border rounded"
           value={newGoalDescription}
           onChange={(e) => setNewGoalDescription(e.target.value)}
@@ -223,6 +238,7 @@ function Goal() {
         </button>
       </div>
       <GoalList goals={goals} onDelete={deleteGoal} onEdit={editGoal} updateProgress={updateProgress} />
+      
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="modal-container">
@@ -230,6 +246,11 @@ function Goal() {
               <h2 className="text-lg font-semibold mb-4">
                 {editGoalId !== null ? 'Edit Goal' : 'Add Goal'}
               </h2>
+              {/* <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(goals.length / pageSize)}
+            onPageChange={setCurrentPage}
+          /> */}
               <input
                 type="text"
                 placeholder="Enter Your Goal"
@@ -273,6 +294,31 @@ function Goal() {
                 >
                   Cancel
                 </button>
+                {editGoalId !== null && (
+                  <button
+                    onClick={() => deleteGoal(editGoalId)}
+                    className="text-white ml-2 bg-red-500 p-2 rounded-md"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+
+             
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold mb-4">Milestones</h2>
+                <Milestones
+                editGoalId={editGoalId}
+                  milestones={milestones}
+                  onAddMilestone={addMilestone}
+                  onToggleMilestone={toggleMilestone}
+                />
+              </div>
+
+              
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold mb-4">Progress Chart</h2>
+                <Graph goals={goals} />
               </div>
             </div>
           </div>
