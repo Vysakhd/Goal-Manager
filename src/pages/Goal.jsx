@@ -4,7 +4,7 @@ import axios from 'axios';
 import GoalList from '../components/GoalList';
 import Graph from '../pages/Graph';
 import Milestones from '../components/Milestones';
-// import Pagination from '../components/Pagination';
+
 
 function Goal() {
   const [goals, setGoals] = useState([]);
@@ -246,21 +246,17 @@ function Goal() {
               <h2 className="text-lg font-semibold mb-4">
                 {editGoalId !== null ? 'Edit Goal' : 'Add Goal'}
               </h2>
-              {/* <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(goals.length / pageSize)}
-            onPageChange={setCurrentPage}
-          /> */}
+              
               <input
                 type="text"
-                placeholder="Enter Your Goal"
+                placeholder="Edit Your Goal"
                 className="w-full p-2 mb-2 border rounded"
                 value={newGoal}
                 onChange={(e) => setNewGoal(e.target.value)}
               />
               <input
                 type="text"
-                placeholder="Goal Updates"
+                placeholder="Edit Goal Description"
                 className="w-full p-2 mb-2 border rounded"
                 value={newGoalDescription}
                 onChange={(e) => setNewGoalDescription(e.target.value)}
@@ -316,10 +312,7 @@ function Goal() {
               </div>
 
               
-              <div className="mt-8">
-                <h2 className="text-lg font-semibold mb-4">Progress Chart</h2>
-                <Graph goals={goals} />
-              </div>
+              
             </div>
           </div>
         </div>

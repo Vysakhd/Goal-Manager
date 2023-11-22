@@ -1,31 +1,43 @@
-import React from 'react';
-import {Chart, ArcElement} from 'chart.js';
+import React, { useEffect, useState } from 'react';
+import { Chart, DoughnutController, ArcElement, Legend, Title, Tooltip } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
-Chart.register(ArcElement);
+// Register the required controllers and elements
+Chart.register(DoughnutController, ArcElement, Legend, Title, Tooltip);
 
-const data = {
-  labels: ['Progress', 'Remaining',
-   'Red',
-      'Blue'
-      
+const Graph = ({ updateList }) => {
+  const [progressData, setProgressData] = useState({
+    labels: ['Completed', 'Remaining'],
+    datasets: [
+      {
+        data: [0, 0],
+        backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
+        hoverOffset: 4,
+      },
     ],
-    datasets: [{
-      label: 'My First Dataset',
-      data: [80,50],
-      backgroundColor: [
-        'rgb(255, 99, 132)',
-        'rgb(54, 162, 235)'
-        
+  });
+
+  useEffect(() => {
+    const completedCount = updateList.filter((update) => update.completed).length;
+    const remainingCount = updateList.length - completedCount;
+
+    setProgressData({
+      labels: ['Completed', 'Remaining'],
+      datasets: [
+        {
+          data: [completedCount, remainingCount],
+          backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
+          hoverOffset: 4,
+        },
       ],
-      hoverOffset: 4
-    }]
-  };
+    });
+  }, [updateList]);
 
-export default function Graph() {
   return (
-    <div className='w-[200px] h-[200px]'>  <Doughnut data={data} ></Doughnut></div>
-  
-  )
-}
+    <div className="w-[200px] h-[200px]">
+      <Doughnut data={progressData} />
+    </div>
+  );
+};
 
+export default Graph;

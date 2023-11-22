@@ -43,7 +43,7 @@ function GoalItem({ goal, onDelete, onEdit, updateProgress }) {
 }
 
 export default GoalItem;
-GoalItem.jsx
+
 
 
 

@@ -1,37 +1,21 @@
+import GoalUpdatesList from "./GoalUpdateList";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const GoalUpdatesList = ({ updates, onDeleteMilestone }) => {
-  return (
-    <ul className="list-disc pl-6">
-      {updates.map(update => (
-        <li key={update.id} className="mb-2">
-          <input type="checkbox" checked={update.completed} readOnly className="mr-2" />
-          {update.updateText}
-          <button
-            onClick={() => onDeleteMilestone(update.id)}
-            className="ml-2 bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
-          >
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-};
+import axios from "axios";
 
 function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
   const [newMilestone, setNewMilestone] = useState('');
   const [addedMilestones, setAddedMilestones] = useState([]);
-  const [updatedData, setUpdatedData] = useState([]);
-
+  const [updatedData, setUpdatedData] = useState(null);
+  const [forceRender, setForceRender] = useState(false); 
   const addMilestone = async () => {
+    console.log(editGoalId)
     if (newMilestone.trim() !== '' && editGoalId) {
       const milestoneData = {
         id: Date.now(),
         text: newMilestone,
         completed: false,
       };
+      console.log(newMilestone)
       try {
         const response = await axios.post(`http://localhost:8080/goals/${editGoalId}`, {
           updateText: newMilestone,
@@ -41,49 +25,62 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
 
         onAddMilestone(createdMilestone);
         setNewMilestone('');
-        setAddedMilestones([...addedMilestones, createdMilestone]);
+
+        
+        setAddedMilestones((prevMilestones) => [...prevMilestones, createdMilestone]);
 
         const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${editGoalId}`);
         setUpdatedData(fetchDataResponse?.data?.milestones);
+        console.log("bro",fetchDataResponse.data.milestones)
+        setForceRender((prev) => !prev); 
       } catch (error) {
         console.error('Error adding milestone:', error);
       }
     }
   };
-
-  const deleteMilestone = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/goals/${editGoalId}/milestone/${id}`);
-      onDeleteMilestone(id);
-
-      // Update state to trigger re-render
-      const updatedMilestones = addedMilestones.filter((milestone) => milestone.id !== id);
-      setAddedMilestones(updatedMilestones);
-
-      // Fetch and update the latest data
-      const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${editGoalId}`);
-      setUpdatedData(fetchDataResponse?.data?.milestones);
-    } catch (error) {
-      console.error('Error deleting milestone:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch milestones data
-        const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${editGoalId}`);
+  const deleteMilestone = (id) => {
+    console.log(id, editGoalId);
+    
+    axios
+      .delete(`http://localhost:8080/goals/${editGoalId}/milestone/${id}`)
+      .then(() => {
+        
+        const updatedMilestones = addedMilestones.filter((milestone) => milestone.id !== id);
+        setAddedMilestones(updatedMilestones);
+  
+        return axios.get(`http://localhost:8080/goals/${editGoalId}`);
+      })
+      .then((fetchDataResponse) => {
         setUpdatedData(fetchDataResponse?.data?.milestones);
-      } catch (error) {
-        console.error('Error fetching milestones:', error);
-      }
+        console.log(fetchDataResponse.data);
+        setForceRender((prev) => !prev); 
+      })
+      .catch((error) => {
+        console.error('Error deleting milestone:', error);
+      });
+  };
+  
+  useEffect(() => {
+    const fetchData = () => {
+      axios
+        .get(`http://localhost:8080/goals/${editGoalId}`)
+        .then((fetchDataResponse) => {
+          setUpdatedData(fetchDataResponse.data.milestones);
+          console.log(fetchDataResponse.data, "bropp")
+          
+        })
+        .catch((error) => {
+          console.error('Error fetching milestones:', error);
+        });
     };
-
-    // Fetch data when the component mounts if editGoalId is available
-    if (editGoalId) {
+  
       fetchData();
-    }
-  }, [editGoalId, updatedData]);
+  }, []);
+  
+  useEffect(() => {
+    
+    console.log('Updated Data Changed:', updatedData);
+  }, [updatedData]);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-4 border rounded bg-white">
@@ -100,12 +97,12 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
         </button>
       </div>
 
-      {updatedData.length > 0 && (
+      {updatedData ? (
         <div className="mt-4">
           <p className="text-gray-500 mb-2"> Milestones:</p>
           <GoalUpdatesList updates={updatedData} onDeleteMilestone={deleteMilestone} />
         </div>
-      )}
+      ): <div>no milestone</div> }
     </div>
   );
 }
