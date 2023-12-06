@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Chart, DoughnutController, ArcElement, Legend, Title, Tooltip } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
-// Register the required controllers and elements
+
 Chart.register(DoughnutController, ArcElement, Legend, Title, Tooltip);
 
 const Graph = ({ updateList }) => {

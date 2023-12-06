@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import GoalList from '../components/GoalList';
-import Graph from '../pages/Graph';
 import Milestones from '../components/Milestones';
+
 
 
 function Goal() {
@@ -16,16 +16,18 @@ function Goal() {
   const [newEndDate, setNewEndDate] = useState('');
   const [milestones, setMilestones] = useState([]);
   const [milestoneText, setMilestoneText] = useState('');
+  const [pageNumber, setPageNumber] = useState(0);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/goals?page=0&size=10')
+    axios.get(`http://localhost:8080/goals?page=${pageNumber}&size=6`)
       .then((response) => {
         setGoals(response.data);
+        console.log('Goals fetched successfully:', response.data);
       })
       .catch((error) => {
         console.error('Error fetching goals:', error);
       });
-  }, []);
+  }, [pageNumber]);
 
   const addGoal = () => {
     if (newGoal.trim() !== '') {
@@ -82,7 +84,7 @@ function Goal() {
   };
 
   const updateGoalList = () => {
-    axios.get('http://localhost:8080/goals?page=0&size=10')
+    axios.get(`http://localhost:8080/goals?page=${pageNumber}&size=6`)
       .then((response) => {
         setGoals(response.data);
       })
@@ -193,15 +195,23 @@ function Goal() {
       prevMilestones.map((milestone) =>
         milestone.id === milestoneId ? { ...milestone, completed: !milestone.completed } : milestone
       )
+     
     );
+
   };
+ const nextPage= () => {
+       setPageNumber(pageNumber+1)
+      }
+      const prevPage= () => {
+        setPageNumber(pageNumber-1)
+       }
 
   return (
-    <div className="container mx-auto p-4 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4 text-center text-blue-800">
+    <div className="container mx-auto p-4 bg-black rounded-xl ">
+      <h1 className="text-3xl font-extrabold mb-4 text-center text-blue-800">
         Goal Management App
       </h1>
-      <div className="flex items-center space-x-2 bg-white p-2 rounded-md mb-4">
+      <div className="flex items-center space-x-2 bg-black p-2 rounded-md mb-4">
         <input
           type="text"
           placeholder="Enter Your Goal"
@@ -235,88 +245,21 @@ function Goal() {
           className="bg-green-500 text-white p-2 rounded-md"
         >
           Add Goal
-        </button>
+        </button> 
+        
       </div>
       <GoalList goals={goals} onDelete={deleteGoal} onEdit={editGoal} updateProgress={updateProgress} />
-      
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="modal-container">
-            <div className="bg-white rounded shadow-lg p-4">
-              <h2 className="text-lg font-semibold mb-4">
-                {editGoalId !== null ? 'Edit Goal' : 'Add Goal'}
-              </h2>
-              
-              <input
-                type="text"
-                placeholder="Edit Your Goal"
-                className="w-full p-2 mb-2 border rounded"
-                value={newGoal}
-                onChange={(e) => setNewGoal(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Edit Goal Description"
-                className="w-full p-2 mb-2 border rounded"
-                value={newGoalDescription}
-                onChange={(e) => setNewGoalDescription(e.target.value)}
-              />
-              <div className="flex space-x-2">
-                <input
-                  type="date"
-                  placeholder="Start Date"
-                  className="w-1/2 p-2 border rounded"
-                  value={newStartDate}
-                  onChange={(e) => setNewStartDate(e.target.value)}
-                />
-                <input
-                  type="date"
-                  placeholder="End Date"
-                  className="w-1/2 p-2 border rounded"
-                  value={newEndDate}
-                  onChange={(e) => setNewEndDate(e.target.value)}
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={saveGoal}
-                  className="bg-blue-500 text-white p-2 rounded-md mr-2"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="bg-red-500 text-white p-2 rounded-md"
-                >
-                  Cancel
-                </button>
-                {editGoalId !== null && (
-                  <button
-                    onClick={() => deleteGoal(editGoalId)}
-                    className="text-white ml-2 bg-red-500 p-2 rounded-md"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
+      <div className='mt-[8px]'>
+      <button className='text-white bg-blue-500 px-4 py-2 rounded mr-2' onClick={nextPage}>
+  Next
+</button>
+<button className='text-white bg-blue-500 px-4 py-2 rounded ml-[1100px]' onClick={prevPage}>
+  Prev
+</button>
+</div>
 
              
-              <div className="mt-8">
-                <h2 className="text-lg font-semibold mb-4">Milestones</h2>
-                <Milestones
-                editGoalId={editGoalId}
-                  milestones={milestones}
-                  onAddMilestone={addMilestone}
-                  onToggleMilestone={toggleMilestone}
-                />
-              </div>
 
-              
-              
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

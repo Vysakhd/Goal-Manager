@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import Graph from '../pages/Graph';
 
 const GoalUpdatesList = ({ updates, onDeleteMilestone }) => {
   const [updateList, setUpdateList] = useState(updates);
+  const [count , setCount] = useState(0)
 
   const handleCheckboxChange = (updateId) => {
     const updatedList = updateList.map((update) =>
       update.id === updateId ? { ...update, completed: !update.completed } : update
     );
     setUpdateList(updatedList);
+    setCount(1)
   };
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const GoalUpdatesList = ({ updates, onDeleteMilestone }) => {
           <li key={update.id} className="mb-2">
             <input
               type="checkbox"
-              checked={update.completed}
+            
               onChange={() => handleCheckboxChange(update.id)}
               className="mr-2"
             />
@@ -43,9 +45,10 @@ const GoalUpdatesList = ({ updates, onDeleteMilestone }) => {
         ))}
       </ul>
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Progress Chart</h2>
-        <Graph updateList={updateList} />
-      </div>
+  <h2 className="text-lg font-semibold mb-4">Progress Chart</h2>
+  <Graph updateList={updateList} />
+</div>
+
     </div>
   );
 };
