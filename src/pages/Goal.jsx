@@ -93,76 +93,7 @@ function Goal() {
       });
   };
 
-  const saveGoal = () => {
-    if (newGoal.trim() !== '') {
-      if (editGoalId !== null) {
-        const updatedGoal = {
-          title: newGoal,
-          description: newGoalDescription,
-          startDate: newStartDate,
-          endDate: newEndDate,
-          milestones: milestones,
-        };
 
-        axios.put(`http://localhost:8080/goals/${editGoalId}`, updatedGoal)
-          .then((response) => {
-            console.log('Goal updated successfully:', response.data);
-            setGoals((prevGoals) =>
-              prevGoals.map((goal) =>
-                goal.id === editGoalId
-                  ? {
-                      ...goal,
-                      title: newGoal,
-                      description: newGoalDescription,
-                      startDate: newStartDate,
-                      endDate: newEndDate,
-                      milestones: milestones,
-                    }
-                  : goal
-              )
-            );
-            closeModal();
-          })
-          .catch((error) => {
-            console.error('Error updating goal:', error);
-          });
-      } else {
-        const newGoalData = {
-          title: newGoal,
-          description: newGoalDescription,
-          startDate: newStartDate,
-          endDate: newEndDate,
-          milestones: milestones,
-        };
-
-        axios.post('http://localhost:8080/goals', newGoalData)
-          .then((response) => {
-            console.log('Goal added successfully:', response.data);
-            setGoals([
-              ...goals,
-              {
-                id: response.data.id, 
-                title: newGoal,
-                description: newGoalDescription,
-                progress: 0,
-                startDate: newStartDate,
-                endDate: newEndDate,
-                milestones: milestones,
-              },
-            ]);
-            setNewGoal('');
-            setNewGoalDescription('');
-            setNewStartDate('');
-            setNewEndDate('');
-            setMilestones([]);
-            closeModal();
-          })
-          .catch((error) => {
-            console.error('Error adding goal:', error);
-          });
-      }
-    }
-  };
 
   const editGoal = (goalId) => {
     setEditGoalId(goalId);
@@ -248,7 +179,7 @@ function Goal() {
         </button> 
         
       </div>
-      <GoalList goals={goals} onDelete={deleteGoal} onEdit={editGoal} updateProgress={updateProgress} />
+      <GoalList goals={goals} onEdit={editGoal} updateProgress={updateProgress} />
       <div className='mt-[8px]'>
       <button className='text-white bg-blue-500 px-4 py-2 rounded mr-2' onClick={nextPage}>
   Next

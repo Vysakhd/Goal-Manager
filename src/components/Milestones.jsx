@@ -2,14 +2,13 @@ import GoalUpdatesList from "./GoalUpdateList";
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 
-function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
+function Milestones({ goalId, onAddMilestone }) {
   const [newMilestone, setNewMilestone] = useState('');
   const [addedMilestones, setAddedMilestones] = useState([]);
   const [updatedData, setUpdatedData] = useState(null);
   const [forceRender, setForceRender] = useState(false); 
   const addMilestone = async () => {
-    console.log(editGoalId)
-    if (newMilestone.trim() !== '' && editGoalId) {
+    if (newMilestone.trim() !== '' && goalId) {
       const milestoneData = {
         id: Date.now(),
         text: newMilestone,
@@ -17,8 +16,10 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
       };
       console.log(newMilestone)
       try {
-        const response = await axios.post(`http://localhost:8080/goals/${editGoalId}`, {
+        const response = await axios.post(`http://localhost:8080/goals/${goalId}`, {
           updateText: newMilestone,
+          "completed":true
+
         });
 
         const createdMilestone = response.data;
@@ -29,26 +30,25 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
         
         setAddedMilestones((prevMilestones) => [...prevMilestones, createdMilestone]);
 
-        const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${editGoalId}`);
+        const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${goalId}`);
         setUpdatedData(fetchDataResponse?.data?.milestones);
-        console.log("bro",fetchDataResponse.data.milestones)
+      
         setForceRender((prev) => !prev); 
       } catch (error) {
         console.error('Error adding milestone:', error);
       }
     }
   };
-  const deleteMilestone = (id) => {
-    console.log(id, editGoalId);
+  const deleteMilestone = (goal) => {
     
     axios
-      .delete(`http://localhost:8080/goals/${editGoalId}/milestone/${id}`)
+      .delete(`http://localhost:8080/goals/${goalId}/milestone/${id}`)
       .then(() => {
         
         const updatedMilestones = addedMilestones.filter((milestone) => milestone.id !== id);
         setAddedMilestones(updatedMilestones);
   
-        return axios.get(`http://localhost:8080/goals/${editGoalId}`);
+        return axios.get(`http://localhost:8080/goals/${goalId}`);
       })
       .then((fetchDataResponse) => {
         setUpdatedData(fetchDataResponse?.data?.milestones);
@@ -63,7 +63,7 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
   useEffect(() => {
     const fetchData = () => {
       axios
-        .get(`http://localhost:8080/goals/${editGoalId}`)
+        .get(`http://localhost:8080/goals/${goalId}`)
         .then((fetchDataResponse) => {
           setUpdatedData(fetchDataResponse.data.milestones);
           console.log(fetchDataResponse.data, "bropp")
@@ -96,7 +96,6 @@ function Milestones({ editGoalId, onAddMilestone, onDeleteMilestone }) {
           Add
         </button>
       </div>
-
       {updatedData ? (
         <div className="mt-4">
           <p className="text-gray-500 mb-2"> Milestones:</p>
