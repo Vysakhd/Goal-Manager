@@ -1,24 +1,24 @@
 import React, { useState,useEffect } from "react";
-import Milestones from '../components/Milestones'; // Import the Milestones component
+import Milestones from '../components/Milestones'; 
 import axios from 'axios';
 import { useParams } from "react-router-dom";
 
 function GoalDetails() {
-  // Define your state variables using useState
+  
   const [newGoal, setNewGoal] = useState("");
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [editGoalId, setEditGoalId] = useState(null);
   const [milestones, setMilestones] = useState([]);
-  const [goals, setGoal] = useState([]); // Assuming you have goals state
+  const [goals, setGoal] = useState([]); 
 
 
-  const params = useParams(); // Assuming your route includes a parameter for goal id
+  const params = useParams(); 
 const goalId = params.id
 
   useEffect(() => {
-    // Fetch goal details when the component mounts
+    
     if (goalId) {
       axios.get(`http://localhost:8080/goals/${goalId}`)
         .then((response) => {
@@ -56,7 +56,7 @@ const goalId = params.id
     axios.delete(`http://localhost:8080/goals/${goalId}`)
       .then((response) => {
         console.log('Goal deleted successfully:', response.data);
-        // Redirect to another page or handle navigation as needed
+        
       })
       .catch((error) => {
         console.error('Error deleting goal:', error);
@@ -92,7 +92,7 @@ const goalId = params.id
                   : goal
               )
             );
-            // closeModal();
+            
           })
           .catch((error) => {
             console.error('Error updating goal:', error);
@@ -126,7 +126,7 @@ const goalId = params.id
             setNewStartDate('');
             setNewEndDate('');
             setMilestones([]);
-            // closeModal();
+            
           })
           .catch((error) => {
             console.error('Error adding goal:', error);
@@ -181,7 +181,7 @@ const goalId = params.id
                       Save
                     </button>
                     <button
-                      // onClick={closeModal}
+                     
                       className="bg-red-500 text-white p-2 rounded-md mt-[3px]"
                     >
                       Cancel

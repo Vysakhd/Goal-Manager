@@ -7,7 +7,21 @@ function Milestones({ goalId, onAddMilestone }) {
   const [addedMilestones, setAddedMilestones] = useState([]);
   const [updatedData, setUpdatedData] = useState(null);
   const [forceRender, setForceRender] = useState(false); 
+
+
+  const deleteMilestone = (milestone) => {
+    console.log(milestone)
+    axios.delete(`http://localhost:8080/goals/${milestone.goalId}/milestone/${milestone.id}`);
+    const updates = updatedData.filter((goal) => {
+      console.log(goal.id, milestone.id);
+      return goal.id !== milestone.id;
+    });
+    console.log(updates)
+    setUpdatedData(updates)
+  };
+
   const addMilestone = async () => {
+    // console.log(updatedData)
     if (newMilestone.trim() !== '' && goalId) {
       const milestoneData = {
         id: Date.now(),
@@ -39,40 +53,20 @@ function Milestones({ goalId, onAddMilestone }) {
       }
     }
   };
-  const deleteMilestone = (goal) => {
-    
+  const fetchData = () => {
     axios
-      .delete(`http://localhost:8080/goals/${goalId}/milestone/${id}`)
-      .then(() => {
-        
-        const updatedMilestones = addedMilestones.filter((milestone) => milestone.id !== id);
-        setAddedMilestones(updatedMilestones);
-  
-        return axios.get(`http://localhost:8080/goals/${goalId}`);
-      })
+      .get(`http://localhost:8080/goals/${goalId}`)
       .then((fetchDataResponse) => {
-        setUpdatedData(fetchDataResponse?.data?.milestones);
-        console.log(fetchDataResponse.data);
-        setForceRender((prev) => !prev); 
+        setUpdatedData(fetchDataResponse.data.milestones);
+        console.log(fetchDataResponse.data, "bropp")
+        
       })
       .catch((error) => {
-        console.error('Error deleting milestone:', error);
+        console.error('Error fetching milestones:', error);
       });
   };
-  
   useEffect(() => {
-    const fetchData = () => {
-      axios
-        .get(`http://localhost:8080/goals/${goalId}`)
-        .then((fetchDataResponse) => {
-          setUpdatedData(fetchDataResponse.data.milestones);
-          console.log(fetchDataResponse.data, "bropp")
-          
-        })
-        .catch((error) => {
-          console.error('Error fetching milestones:', error);
-        });
-    };
+   
   
       fetchData();
   }, []);
@@ -99,7 +93,7 @@ function Milestones({ goalId, onAddMilestone }) {
       {updatedData ? (
         <div className="mt-4">
           <p className="text-gray-500 mb-2"> Milestones:</p>
-          <GoalUpdatesList updates={updatedData} onDeleteMilestone={deleteMilestone} />
+          <GoalUpdatesList deleteMilestone={deleteMilestone}     fetchData={fetchData} updates={updatedData} />
         </div>
       ): <div>no milestone</div> }
     </div>
