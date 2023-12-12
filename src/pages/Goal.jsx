@@ -1,17 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchGoals, addGoal } from '../goalsSlice'; // Adjust the path based on your project structure
 import GoalList from '../components/GoalList';
 import Milestones from '../components/Milestones';
 
-
-
 function Goal() {
-  const [goals, setGoals] = useState([]);
+  const dispatch = useDispatch();
+  const goals = useSelector((state) => state.goals.goals);
+  const status = useSelector((state) => state.goals.status);
+  const error = useSelector((state) => state.goals.error);
+
   const [newGoal, setNewGoal] = useState('');
   const [newGoalDescription, setNewGoalDescription] = useState('');
-  const [editGoalId, setEditGoalId] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [milestones, setMilestones] = useState([]);
@@ -19,79 +19,85 @@ function Goal() {
   const [pageNumber, setPageNumber] = useState(0);
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/goals?page=${pageNumber}&size=6`)
-      .then((response) => {
-        setGoals(response.data);
-        console.log('Goals fetched successfully:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching goals:', error);
-      });
-  }, [pageNumber]);
+    dispatch(fetchGoals(pageNumber));
+  }, [dispatch, pageNumber]);
 
-  const addGoal = () => {
-    if (newGoal.trim() !== '') {
-      const newGoalData = {
+  const addGoalHandler = () => {
+    dispatch(
+      addGoal({
         title: newGoal,
         description: newGoalDescription,
         startDate: newStartDate,
         endDate: newEndDate,
         milestones: milestones,
-      };
-
-      axios.post('http://localhost:8080/goals', newGoalData)
-        .then((response) => {
-          console.log('Goal added successfully:', response.data);
-          setNewGoal('');
-          setNewGoalDescription('');
-          setNewStartDate('');
-          setNewEndDate('');
-          setMilestones([]);
-          closeModal();
-          updateGoalList();
-        })
-        .catch((error) => {
-          console.error('Error adding goal:', error);
-        });
-    }
-  };
-
-  const deleteGoal = (goalId) => {
-    axios.delete(`http://localhost:8080/goals/${goalId}`)
-      .then((response) => {
-        console.log('Goal deleted successfully:', response.data);
-        setGoals(goals.filter((goal) => goal.id !== goalId));
-        closeModal();
       })
-      .catch((error) => {
-        console.error('Error deleting goal:', error);
-      });
+    );
   };
 
-  const openModal = () => {
-    setModalOpen(true);
-  };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setEditGoalId(null);
-    setNewGoal('');
-    setNewGoalDescription('');
-    setNewStartDate('');
-    setNewEndDate('');
-    setMilestones([]);
-    setMilestoneText('');
-  };
+  // const addGoal = () => {
+  //   if (newGoal.trim() !== '') {
+  //     const newGoalData = {
+  //       title: newGoal,
+  //       description: newGoalDescription,
+  //       startDate: newStartDate,
+  //       endDate: newEndDate,
+  //       milestones: milestones,
+  //     };
 
-  const updateGoalList = () => {
-    axios.get(`http://localhost:8080/goals?page=${pageNumber}&size=6`)
-      .then((response) => {
-        setGoals(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching goals:', error);
-      });
-  };
+  //     axios.post('http://localhost:8080/goals', newGoalData)
+  //       .then((response) => {
+  //         console.log('Goal added successfully:', response.data);
+  //         setNewGoal('');
+  //         setNewGoalDescription('');
+  //         setNewStartDate('');
+  //         setNewEndDate('');
+  //         setMilestones([]);
+  //         closeModal();
+  //         updateGoalList();
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error adding goal:', error);
+  //       });
+  //   }
+  // };
+
+  // const deleteGoal = (goalId) => {
+  //   axios.delete(`http://localhost:8080/goals/${goalId}`)
+  //     .then((response) => {
+  //       console.log('Goal deleted successfully:', response.data);
+  //       setGoals(goals.filter((goal) => goal.id !== goalId));
+  //       closeModal();
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error deleting goal:', error);
+  //     });
+  // };
+
+  // const openModal = () => {
+  //   setModalOpen(true);
+  // };
+
+  // const closeModal = () => {
+  //   setModalOpen(false);
+  //   setEditGoalId(null);
+  //   setNewGoal('');
+  //   setNewGoalDescription('');
+  //   setNewStartDate('');
+  //   setNewEndDate('');
+  //   setMilestones([]);
+  //   setMilestoneText('');
+  // };
+
+  // const updateGoalList = () => {
+  //   axios.get(`http://localhost:8080/goals?page=${pageNumber}&size=6`)
+  //     .then((response) => {
+  //       setGoals(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching goals:', error);
+  //     });
+  // };
 
 
 
@@ -114,22 +120,22 @@ function Goal() {
     );
   };
 
-  const addMilestone = () => {
-    if (milestoneText.trim() !== '') {
-      setMilestones([...milestones, { id: Date.now(), text: milestoneText, completed: false }]);
-      setMilestoneText('');
-    }
-  };
+  // const addMilestone = () => {
+  //   if (milestoneText.trim() !== '') {
+  //     setMilestones([...milestones, { id: Date.now(), text: milestoneText, completed: false }]);
+  //     setMilestoneText('');
+  //   }
+  // };
 
-  const toggleMilestone = (milestoneId) => {
-    setMilestones((prevMilestones) =>
-      prevMilestones.map((milestone) =>
-        milestone.id === milestoneId ? { ...milestone, completed: !milestone.completed } : milestone
-      )
+  // const toggleMilestone = (milestoneId) => {
+  //   setMilestones((prevMilestones) =>
+  //     prevMilestones.map((milestone) =>
+  //       milestone.id === milestoneId ? { ...milestone, completed: !milestone.completed } : milestone
+  //     )
      
-    );
+  //   );
 
-  };
+  // };
  const nextPage= () => {
        setPageNumber(pageNumber+1)
       }
@@ -172,7 +178,7 @@ function Goal() {
           onChange={(e) => setNewEndDate(e.target.value)}
         />
         <button
-          onClick={addGoal}
+          onClick={addGoalHandler}
           className="bg-green-500 text-white p-2 rounded-md"
         >
           Add Goal
