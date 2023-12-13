@@ -18,6 +18,7 @@ const Graph = ({ updateList }) => {
   });
 
   useEffect(() => {
+    console.log(updateList)
     const completedCount = updateList.filter((update) => update.completed).length;
     const remainingCount = updateList.length - completedCount;
 

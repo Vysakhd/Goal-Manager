@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from 'react';
 
 import Graph from '../pages/Graph';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleCheckbox } from '../milestoneSlice'; 
 
-const GoalUpdatesList = ({deleteMilestone, updates,fetchData }) => {
+
+const GoalUpdatesList = ({deleteMilestone,fetchData }) => {
+  const dispatch = useDispatch();
+  const updates = useSelector((state) => state.milestone.milestones);
+console.log(updates)
   const deleteMiles = (milestone) => {
     deleteMilestone(milestone)
   };
 
-  const [updateList, setUpdateList] = useState(updates);
+  const [updateList, setUpdateList] = useState(null);
+  
 
-  const handleCheckboxChange = (updateId) => {
-    setUpdateList((prevUpdateList) =>
-      prevUpdateList.map((update) =>
-        update.id === updateId ? { ...update, completed: !update.completed } : update
-      )
-    );
+  console.log(updateList)
+
+  const handleCheckboxClick = (milestoneId) => {
+    dispatch(handleCheckbox(milestoneId));
   };
-
-  useEffect(() => {
-    console.log('updateList changed:', updateList);
-  }, [updateList]);
-
-  useEffect(() => {
-    console.log('GoalUpdatesList re-rendered');
-  }, [updates]);
-
+  console.log(updates)
+  
   return (
     <div>
       <ul className="list-disc pl-6">
@@ -32,7 +30,7 @@ const GoalUpdatesList = ({deleteMilestone, updates,fetchData }) => {
           <li key={update.id} className="mb-2">
             <input
               type="checkbox"
-              onChange={() => handleCheckboxChange(update.id)}
+              onChange={() => handleCheckboxClick(update.id)}
               className="mr-2"
             />
             {update.updateText}

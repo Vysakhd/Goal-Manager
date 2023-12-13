@@ -1,80 +1,31 @@
 import GoalUpdatesList from "./GoalUpdateList";
 import React, { useState, useEffect } from 'react';
-import axios from "axios";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMilestonesAsync, addMilestoneAsync, deleteMilestoneAsync } from '../milestoneSlice'; 
 
 function Milestones({ goalId, onAddMilestone }) {
+  const dispatch = useDispatch();
+  const updatedData = useSelector((state) => state.milestone.milestones);
   const [newMilestone, setNewMilestone] = useState('');
-  const [addedMilestones, setAddedMilestones] = useState([]);
-  const [updatedData, setUpdatedData] = useState(null);
-  const [forceRender, setForceRender] = useState(false); 
 
+  useEffect(() => {
+    dispatch(fetchMilestonesAsync(goalId));
+  }, [dispatch, goalId]);
 
   const deleteMilestone = (milestone) => {
-    console.log(milestone)
-    axios.delete(`http://localhost:8080/goals/${milestone.goalId}/milestone/${milestone.id}`);
-    const updates = updatedData.filter((goal) => {
-      console.log(goal.id, milestone.id);
-      return goal.id !== milestone.id;
-    });
-    console.log(updates)
-    setUpdatedData(updates)
+    dispatch(deleteMilestoneAsync({ goalId: milestone.goalId, milestoneId: milestone.id }));
   };
 
   const addMilestone = async () => {
-    // console.log(updatedData)
     if (newMilestone.trim() !== '' && goalId) {
-      const milestoneData = {
-        id: Date.now(),
-        text: newMilestone,
-        completed: false,
-      };
-      console.log(newMilestone)
       try {
-        const response = await axios.post(`http://localhost:8080/goals/${goalId}`, {
-          updateText: newMilestone,
-          "completed":true
-
-        });
-
-        const createdMilestone = response.data;
-
-        onAddMilestone(createdMilestone);
+        await dispatch(addMilestoneAsync({ goalId, newMilestone }));
         setNewMilestone('');
-
-        
-        setAddedMilestones((prevMilestones) => [...prevMilestones, createdMilestone]);
-
-        const fetchDataResponse = await axios.get(`http://localhost:8080/goals/${goalId}`);
-        setUpdatedData(fetchDataResponse?.data?.milestones);
-      
-        setForceRender((prev) => !prev); 
       } catch (error) {
         console.error('Error adding milestone:', error);
       }
     }
   };
-  const fetchData = () => {
-    axios
-      .get(`http://localhost:8080/goals/${goalId}`)
-      .then((fetchDataResponse) => {
-        setUpdatedData(fetchDataResponse.data.milestones);
-        console.log(fetchDataResponse.data, "bropp")
-        
-      })
-      .catch((error) => {
-        console.error('Error fetching milestones:', error);
-      });
-  };
-  useEffect(() => {
-   
-  
-      fetchData();
-  }, []);
-  
-  useEffect(() => {
-    
-    console.log('Updated Data Changed:', updatedData);
-  }, [updatedData]);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-4 border rounded bg-white">
@@ -93,9 +44,9 @@ function Milestones({ goalId, onAddMilestone }) {
       {updatedData ? (
         <div className="mt-4">
           <p className="text-gray-500 mb-2"> Milestones:</p>
-          <GoalUpdatesList deleteMilestone={deleteMilestone}     fetchData={fetchData} updates={updatedData} />
+          <GoalUpdatesList deleteMilestone={deleteMilestone} fetchData={fetchMilestonesAsync} updates={updatedData} />
         </div>
-      ): <div>no milestone</div> }
+      ) : <div>no milestone</div>}
     </div>
   );
 }

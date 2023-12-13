@@ -9,7 +9,6 @@ function GoalDetails() {
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
-  const [editGoalId, setEditGoalId] = useState(null);
   const [milestones, setMilestones] = useState([]);
   const [goals, setGoal] = useState([]); 
 
@@ -66,7 +65,9 @@ const goalId = params.id
 
   const saveGoal = () => {
     if (newGoal.trim() !== '') {
-      if (editGoalId !== null) {
+
+      if (goalId !== null) {
+        
         const updatedGoal = {
           title: newGoal,
           description: newGoalDescription,
@@ -74,13 +75,13 @@ const goalId = params.id
           endDate: newEndDate,
           milestones: milestones,
         };
-
-        axios.put(`http://localhost:8080/goals/${editGoalId}`, updatedGoal)
+        console.log(updatedGoal, "hi")
+        axios.put(`http://localhost:8080/goals/${goalId}`, updatedGoal)
           .then((response) => {
             console.log('Goal updated successfully:', response.data);
             setGoals((prevGoals) =>
               prevGoals.map((goal) =>
-                goal.id === editGoalId
+                goal.id === goalId
                   ? {
                       ...goal,
                       title: newGoal,
@@ -139,7 +140,7 @@ const goalId = params.id
               <div className="modal-container">
                 <div className="bg-blue-100 rounded shadow-lg p-4  overflow-y-auto">
                   <h2 className="text-lg font-semibold mb-4">
-                    {editGoalId !== null ? 'Edit Goal' : 'Add Goal'}
+                    {goalId !== null ? 'Edit Goal' : 'Add Goal'}
                   </h2>
                   
                   <input
@@ -180,15 +181,9 @@ const goalId = params.id
                     >
                       Save
                     </button>
-                    <button
-                     
-                      className="bg-red-500 text-white p-2 rounded-md mt-[3px]"
-                    >
-                      Cancel
-                    </button>
-                    {editGoalId !== null && (
+                    {goalId !== null && (
                       <button
-                        onClick={() => deleteGoal(editGoalId)}
+                        onClick={() => deleteGoal(goalId)}
                         className="text-white ml-2 bg-red-500 p-2 rounded-md mt-[3px]"
                       >
                         Delete
