@@ -2,20 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGoals, addGoal } from '../goalsSlice'; 
 import GoalList from '../components/GoalList';
-import Milestones from '../components/Milestones';
+
 
 function Goal() {
   const dispatch = useDispatch();
   const goals = useSelector((state) => state.goals.goals);
-  const status = useSelector((state) => state.goals.status);
-  const error = useSelector((state) => state.goals.error);
+  
 
   const [newGoal, setNewGoal] = useState('');
   const [newGoalDescription, setNewGoalDescription] = useState('');
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [milestones, setMilestones] = useState([]);
-  const [milestoneText, setMilestoneText] = useState('');
+  const [editGoalId, setEditGoalId] = useState();
   const [pageNumber, setPageNumber] = useState(0);
 
   useEffect(() => {
@@ -42,7 +41,6 @@ function Goal() {
     setNewStartDate(goalToEdit.startDate);
     setNewEndDate(goalToEdit.endDate);
     setMilestones(goalToEdit.milestones || []);
-    openModal();
   };
 
   const updateProgress = (goalId, newProgress) => {
@@ -80,20 +78,24 @@ function Goal() {
           value={newGoalDescription}
           onChange={(e) => setNewGoalDescription(e.target.value)}
         />
-        <input
-          type="date"
-          placeholder="Start Date"
-          className="w-1/5 p-2 border rounded"
-          value={newStartDate}
-          onChange={(e) => setNewStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          placeholder="End Date"
-          className="w-1/5 p-2 border rounded"
-          value={newEndDate}
-          onChange={(e) => setNewEndDate(e.target.value)}
-        />
+        <label className="block text-sm font-medium text-white mb-1">Start Date</label>
+<input
+  type="date"
+  placeholder="Start Date"
+  className="w-1/5 p-2 border rounded"
+  value={newStartDate}
+  onChange={(e) => setNewStartDate(e.target.value)}
+/>
+
+<label className="block text-sm font-medium text-white mb-1">End Date</label>
+<input
+  type="date"
+  placeholder="End Date"
+  className="w-1/5 p-2 border rounded"
+  value={newEndDate}
+  onChange={(e) => setNewEndDate(e.target.value)}
+/>
+
         <button
           onClick={addGoalHandler}
           className="bg-green-500 text-white p-2 rounded-md"
@@ -104,11 +106,11 @@ function Goal() {
       </div>
       <GoalList goals={goals} onEdit={editGoal} updateProgress={updateProgress} />
       <div className='mt-[8px]'>
-      <button className='text-white bg-blue-500 px-4 py-2 rounded mr-2' onClick={nextPage}>
-  Next
-</button>
-<button className='text-white bg-blue-500 px-4 py-2 rounded ml-[1100px]' onClick={prevPage}>
+      <button className='text-white bg-blue-500 px-4 py-2 rounded mr-2' onClick={prevPage}>
   Prev
+</button>
+<button className='text-white bg-blue-500 px-4 py-2 rounded ml-[1100px]' onClick={nextPage}>
+  Next
 </button>
 </div>
 

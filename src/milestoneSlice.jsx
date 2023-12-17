@@ -3,7 +3,6 @@ import axios from 'axios';
 
 export const fetchMilestonesAsync = createAsyncThunk('milestone/fetchMilestones', async (goalId) => {
   const response = await axios.get(`http://localhost:8080/goals/${goalId}`);
-  console.log(response.data.milestones)
 
   return response.data.milestones;
 });
@@ -25,8 +24,8 @@ export const completeMilestone = (state, action) => {
     const milestoneId = action.payload;
     const updatedMilestones = state.milestones.map((milestone) => {
       if (milestone.id === milestoneId) {
-        return { ...milestone, completed: true };
-      }
+        return { ...milestone, completed: !milestone.completed };
+    }
       return milestone;
     });
     state.milestones = updatedMilestones;

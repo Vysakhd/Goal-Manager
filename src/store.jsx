@@ -1,12 +1,13 @@
 
 import { configureStore } from '@reduxjs/toolkit';
-import goalsReducer from './goalsSlice';
-import milestoneReducer from './milestoneSlice';
-
+import goalsSLice from './goalsSlice';
+import milestoneSlice from './milestoneSlice';
+import goalSlice from './goalSlice';
 const store = configureStore({
   reducer: {
-    goals: goalsReducer,
-    milestone: milestoneReducer,
+    goal: goalSlice,
+    goals: goalsSLice,
+    milestone: milestoneSlice,
   },
 });
 

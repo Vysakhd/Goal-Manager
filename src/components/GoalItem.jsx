@@ -16,6 +16,7 @@ function GoalItem({ goal, onDelete, onEdit, updateProgress }) {
         <div className='text-[35px] font-extrabold text-center'>{goal.title}</div>
         <div className='text-[25px] font-extrabold '>{goal.text}</div>
         <div className='mt-[px] font-extrabold text-center mt-[20px]'>{goal.description}</div>
+        
         {isEditingProgress ? (
           <div>
             <input
@@ -39,6 +40,12 @@ function GoalItem({ goal, onDelete, onEdit, updateProgress }) {
 }
 
 export default GoalItem;
+
+
+
+
+
+
 
 
 

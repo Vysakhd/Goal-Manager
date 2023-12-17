@@ -18,7 +18,7 @@ const Graph = ({ updateList }) => {
   });
 
   useEffect(() => {
-    console.log(updateList)
+    // console.log(updateList)
     const completedCount = updateList.filter((update) => update.completed).length;
     const remainingCount = updateList.length - completedCount;
 
@@ -42,3 +42,6 @@ const Graph = ({ updateList }) => {
 };
 
 export default Graph;
+
+
+

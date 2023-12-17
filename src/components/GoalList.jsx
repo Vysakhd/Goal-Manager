@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import GoalItem from './GoalItem';
 
+
 function GoalList({ goals, onEdit, updateProgress }) {
   return (
     <div className="mt-[4px] flex gap-3 flex-wrap ">
@@ -11,6 +12,7 @@ function GoalList({ goals, onEdit, updateProgress }) {
           <Link to={`/details/${goal.id}`} key={goal.id}>
             <GoalItem goal={goal}  onEdit={onEdit} updateProgress={updateProgress} />
           </Link>
+          
         </div>
       ))}
     </div>
@@ -18,3 +20,7 @@ function GoalList({ goals, onEdit, updateProgress }) {
 }
 
 export default GoalList;
+
+
+
+
