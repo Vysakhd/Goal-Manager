@@ -9,14 +9,14 @@ function GoalDetails() {
   const { id: goalId } = useParams();
   const goal = useSelector((state) => state.goal.goal);
   const milestones = useSelector((state) => state.goal.milestones);
-  // console.log(goal, milestones);
+  
   const [newGoal, setNewGoal] = useState("");
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [goals, setGoal] = useState([]);
   const [newMilestones, setNewMilestones] = useState("");
-  // console.log(goal, milestones);
+  
 
   useEffect(() => {
     if (goalId) {
@@ -25,8 +25,7 @@ function GoalDetails() {
   }, [dispatch, goalId]);
 
   useEffect(() => {
-    // setGoal(goal);
-    // console.log(goal);
+    
     if (goal) {
       setNewGoal(goal.title);
       setNewGoalDescription(goal.description);
@@ -69,9 +68,7 @@ function GoalDetails() {
         endDate: newEndDate,
       };
 
-      // const editMilestoneData = {
-      //   completed:
-      // }
+      
       if (!newGoal) {
         alert("Enter the title");
       } else if (!newGoalDescription) {
@@ -89,7 +86,6 @@ function GoalDetails() {
         }
       }
     } else {
-      console.log("Calling htis nsidnuf");
       dispatch(addGoal(goalData));
     }
     setNewGoal("");

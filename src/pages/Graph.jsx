@@ -6,6 +6,7 @@ import { Doughnut } from 'react-chartjs-2';
 Chart.register(DoughnutController, ArcElement, Legend, Title, Tooltip);
 
 const Graph = ({ updateList }) => {
+  
   const [progressData, setProgressData] = useState({
     labels: ['Completed', 'Remaining'],
     datasets: [
@@ -18,7 +19,7 @@ const Graph = ({ updateList }) => {
   });
 
   useEffect(() => {
-    // console.log(updateList)
+    
     const completedCount = updateList.filter((update) => update.completed).length;
     const remainingCount = updateList.length - completedCount;
 

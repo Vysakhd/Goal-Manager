@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import GoalItem from './GoalItem';
 
 
+
 function GoalList({ goals, onEdit, updateProgress }) {
   return (
     <div className="mt-[4px] flex gap-3 flex-wrap ">
